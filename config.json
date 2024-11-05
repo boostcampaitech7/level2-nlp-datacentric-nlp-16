@@ -1,0 +1,8 @@
+{
+    "RUN_NAME": "run_by_run",
+    "SEED": 456,
+    "EPOCHS": 10,
+    "BATCH_SIZE": 16,
+    "LEARNING_RATE": 2e-5,
+    "WEIGHT_DECAY": 0.01
+}
