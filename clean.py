@@ -1,17 +1,19 @@
-import os
 import argparse
+import os
 
 import pandas as pd
 import transformers
 
-from utils.util import set_seed
 from utils.clean_text import calculate_ratio, denoise_text
+from utils.util import set_seed
 
 transformers.logging.set_verbosity_error()
+
 
 def main(arg):
     ## parameters
     SEED = arg.seed
+    MODEL_ID = arg.model_id
     KR_UB = arg.kr_ub
     KR_LB = arg.kr_lb
     SP_UB = arg.sp_ub
@@ -21,25 +23,26 @@ def main(arg):
     set_seed(SEED)
 
     ## data loading
-    data = pd.read_csv(os.path.join('./data', 'train.csv'))
+    BASE_DIR = os.getcwd()
+    DATA_DIR = os.path.join(BASE_DIR, "data")
+    data = pd.read_csv(os.path.join(DATA_DIR, "train.csv"))
 
     ## text ratio
-    res = data['text'].apply(lambda x: pd.Series(calculate_ratio(x)))
+    res = data["text"].apply(lambda x: pd.Series(calculate_ratio(x)))
     special_ratio = res[0]
     korean_ratio = res[1]
 
     idx_korean = (korean_ratio >= KR_LB) & (korean_ratio < KR_UB)
-    # idx_special = (special_ratio <= SP_UB) & (special_ratio > SP_LB)
-    idx = idx_korean # & idx_special
+    idx_special = (special_ratio <= SP_UB) & (special_ratio > SP_LB)
+    idx = idx_korean & idx_special
     cleanable_data = data[idx]
 
     ## denoise
-    model_id = "aifeifei798/Meta-Llama-3.1-8B-Instruct"
-    with open('./codes/prompt.txt', 'r') as f:
+    with open(os.path.join(BASE_DIR, "prompt.txt"), "r") as f:
         template = f.read()
     output_txts = denoise_text(
         texts=cleanable_data["text"].tolist(),
-        model_id=model_id,
+        model_id=MODEL_ID,
         template=template,
     )
 
@@ -47,11 +50,12 @@ def main(arg):
 
     ## remove not-cleanable text
     idx_korean = korean_ratio < KR_LB
-    # idx_special = special_ratio > SP_UB
-    idx = idx_korean # & idx_special
+    idx_special = special_ratio > SP_UB
+    idx = idx_korean & idx_special
     data = data[~idx]
 
-    data.to_csv(os.path.join('./data', 'train_cleaned.csv'), index=False)
+    data.to_csv(os.path.join(DATA_DIR, "train_cleaned.csv"), index=False)
+
 
 if __name__ == "__main__":
     args = argparse.ArgumentParser()
@@ -61,6 +65,13 @@ if __name__ == "__main__":
         default=456,
         type=int,
         help="setting random seed (default: 456)",
+    )
+    args.add_argument(
+        "-m",
+        "--model_id",
+        default=None,
+        type=str,
+        help="hugging face model id (default: None)",
     )
     args.add_argument(
         "-ku",
