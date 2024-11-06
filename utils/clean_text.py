@@ -46,9 +46,10 @@ def denoise_text(texts, model_id, template):
             answer = answer.split('"')[1::2].pop()
         except:
             removed += 1
-            answer = ""
+            answer = text
         ### for case that the answer is less than or equal to 5 in length
         if len(answer) <= 5:
+            removed += 1
             answer = text
 
         output_txts.append(answer)
