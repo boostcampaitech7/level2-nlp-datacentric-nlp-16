@@ -2,11 +2,12 @@ import argparse
 
 import pandas as pd
 import torch
-from sklearn.linear_model import LogisticRegression
-from transformers import AutoTokenizer, AutoModel
 from cleanlab.classification import CleanLearning
+from sklearn.linear_model import LogisticRegression
+from transformers import AutoModel, AutoTokenizer
 
 from utils.util import set_seed
+
 
 def main(arg):
     SEED = arg.seed
@@ -18,7 +19,7 @@ def main(arg):
     set_seed(SEED)
 
     ## data loading
-    data = pd.read_csv('./data/train_cleaned.csv')
+    data = pd.read_csv("./data/add_B.T_train_kang.csv")
 
     ## model loading
     tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
@@ -29,13 +30,15 @@ def main(arg):
 
     ## embedding
     tokenized = tokenizer(
-        data["text"].tolist(),
+        data["B.T_text"].tolist(),
         padding=True,
-        truncation="max_length",
+        truncation=True,
+        max_length=128,
         return_tensors="pt",
     )
     inputs = {key: val.to(device) for key, val in tokenized.items()}
 
+    model.eval()
     with torch.no_grad():
         outputs = model(**inputs)
     text_emb = outputs.last_hidden_state.mean(dim=1)
@@ -46,10 +49,11 @@ def main(arg):
     cl = CleanLearning(model, cv_n_folds=K)
 
     label_issues = cl.find_label_issues(X=text_emb, labels=data["target"].values)
-    idx = (label_issues["is_label_issue"] == True)
-    data.loc[idx, "target"] = label_issues["predicted_label"]
+    idx = label_issues["is_label_issue"] == True
+    data.loc[idx, "target"] = label_issues.loc[idx, "predicted_label"]
 
     data.to_csv("./data/train_corrected.csv")
+
 
 if __name__ == "__main__":
     args = argparse.ArgumentParser()
