@@ -1,3 +1,4 @@
+import argparse
 import os
 import random
 
@@ -20,14 +21,14 @@ from utils.util import set_seed
 
 def main(arg):
     ## paramterts
-    SEED = 456
+    SEED = arg.seed
     MODEL_ID = arg.model_id
     NUM_LABELS = arg.n
-    TOP_K = arg.k
-    EPOCHS = 10
-    BATCH_SIZE = 16
-    LEARNING_RATE = 0.001
-    WEIGHT_DECAY = 0.00001
+    TOP_K = arg.top_k
+    EPOCHS = arg.epochs
+    BATCH_SIZE = arg.batch_size
+    LEARNING_RATE = arg.learning_rate
+    WEIGHT_DECAY = arg.weight_decay
 
     ## random seeding
     set_seed(SEED)
@@ -119,3 +120,66 @@ def main(arg):
         output.replace("</s>", "")
         output.replace("<s>", "")
         outputs.append(output)
+
+
+if __name__ == "__main__":
+    args = argparse.ArgumentParser()
+    args.add_argument(
+        "-s",
+        "--seed",
+        default=456,
+        type=int,
+        help="setting random seed (default: 456)",
+    )
+    args.add_argument(
+        "-m",
+        "--model_id",
+        default="FacebookAI/xlm-roberta-large",
+        type=str,
+        help="hugging face model id (default: FacebookAI/xlm-roberta-large)",
+    )
+    args.add_argument(
+        "-n",
+        "--num_labels",
+        default=7,
+        type=int,
+        help="the number of labels to predict (default: 7)",
+    )
+    args.add_argument(
+        "-k",
+        "--top_k",
+        default=3,
+        type=int,
+        help="the number of candidates for synonym replacement (default: 3)",
+    )
+    args.add_argument(
+        "-e",
+        "--epochs",
+        default=10,
+        type=int,
+        help="epoch size (default: 10)",
+    )
+    args.add_argument(
+        "-b",
+        "--batch_size",
+        default=16,
+        type=int,
+        help="mini-batch size (default: 16)",
+    )
+    args.add_argument(
+        "-lr",
+        "--learning_rate",
+        default=0.001,
+        type=float,
+        help="learning rate for training C-BERT (default: 0.001)",
+    )
+    args.add_argument(
+        "-w",
+        "--weight_decay",
+        default=0.0001,
+        type=float,
+        help="weight decay for learning rate scheduler (default: 0.0001)",
+    )
+
+    arg = args.parse_args()
+    main(arg)
