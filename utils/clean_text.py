@@ -14,12 +14,10 @@ def calculate_ratio(text):
     if total_chars == 0:
         return (0, 0)
 
-    special_chars = len(re.findall(r"[^가-힣0-9a-zA-Z\s.]", text))
     korean_chars = len(re.findall(r"[가-힣]", text))
-
-    special_ratio = special_chars / total_chars
     korean_ratio = korean_chars / total_chars
-    return special_ratio, korean_ratio
+
+    return korean_ratio
 
 
 def denoise_text(texts, model_id, template):

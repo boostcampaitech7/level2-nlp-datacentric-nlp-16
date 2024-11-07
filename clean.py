@@ -16,8 +16,6 @@ def main(arg):
     MODEL_ID = arg.model_id
     KR_UB = arg.kr_ub
     KR_LB = arg.kr_lb
-    SP_UB = arg.sp_ub
-    SP_LB = arg.sp_lb
 
     ## random seeding
     set_seed(SEED)
@@ -28,13 +26,11 @@ def main(arg):
     data = pd.read_csv(os.path.join(DATA_DIR, "train.csv"))
 
     ## text ratio
-    res = data["text"].apply(lambda x: pd.Series(calculate_ratio(x)))
-    special_ratio = res[0]
+    res = data["text"].apply(lambda x: calculate_ratio(x))
     korean_ratio = res[1]
 
     idx_korean = (korean_ratio >= KR_LB) & (korean_ratio < KR_UB)
-    idx_special = (special_ratio <= SP_UB) & (special_ratio > SP_LB)
-    idx = idx_korean & idx_special
+    idx = idx_korean
     cleanable_data = data[idx]
 
     ## denoise
@@ -50,8 +46,7 @@ def main(arg):
 
     ## remove not-cleanable text
     idx_korean = korean_ratio < KR_LB
-    idx_special = special_ratio > SP_UB
-    idx = idx_korean & idx_special
+    idx = idx_korean
     data = data[~idx]
 
     data.to_csv(os.path.join(DATA_DIR, "train_cleaned.csv"), index=False)
@@ -86,20 +81,6 @@ if __name__ == "__main__":
         default=0.5,
         type=float,
         help="lower bound for korean ratio in text (default: 0.5)",
-    )
-    args.add_argument(
-        "-su",
-        "--sp_ub",
-        default=0.5,
-        type=float,
-        help="upper bound for special symbol ratio in text (default: 0.5)",
-    )
-    args.add_argument(
-        "-sl",
-        "--sp_lb",
-        default=0.25,
-        type=float,
-        help="lower bound for special symbol ratio in text (default: 0.25)",
     )
 
     arg = args.parse_args()
