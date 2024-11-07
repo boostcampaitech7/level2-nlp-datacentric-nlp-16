@@ -3,6 +3,17 @@ from torch.utils.data import Dataset
 
 
 class MaskedDataset(Dataset):
+    """
+    Dataset class for C-BERT
+    Save tokenized input text and Update token type index to label index for label embedding
+
+    Args:
+        texts (List[str]): input texts
+        labels (List[int]): corresponding target labels for input texts
+        tokenizer: tokenizer for input texts
+        max_length: max token length for text (default: 32)
+    """
+
     def __init__(self, texts, labels, tokenizer, max_length=32):
         self.texts = texts
         self.labels = labels
