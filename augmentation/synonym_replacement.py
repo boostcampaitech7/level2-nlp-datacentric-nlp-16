@@ -15,7 +15,7 @@ def main(arg):
     SEED = arg.seed
     MODEL_ID = arg.model_id
     NUM_LABELS = arg.n
-    TOP_K = arg.k
+    TOP_K = arg.top_k
 
     # random seeding
     set_seed(SEED)
