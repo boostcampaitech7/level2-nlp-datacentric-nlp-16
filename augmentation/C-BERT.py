@@ -20,6 +20,13 @@ from utils.util import set_seed
 
 
 def main(arg):
+    """
+    Add label encoding to BERT-based model
+    for label-robust augmentation
+
+    Args:
+        arg (_type_): _description_
+    """
     ## paramterts
     SEED = arg.seed
     MODEL_ID = arg.model_id
