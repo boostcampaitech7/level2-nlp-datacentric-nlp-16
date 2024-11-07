@@ -11,6 +11,18 @@ transformers.logging.set_verbosity_error()
 
 
 def main(arg):
+    """
+    Clean dataset using Korean ratio and LM
+
+    Firstly, detect noisy texts by Korean character ratio
+    Nextly, denoise the text using LM with prompt engineering
+
+    Args:
+        SEED (int): random seed number
+        MODEL_ID (str): huggingface model id
+        KR_UB (float): Korean ratio upper bound for cleanable noisy texts group
+        KR_LB (float): Korean ratio lower bound for cleanable noisy texts group
+    """
     ## parameters
     SEED = arg.seed
     MODEL_ID = arg.model_id
