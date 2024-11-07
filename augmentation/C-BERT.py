@@ -128,6 +128,9 @@ def main(arg):
         output.replace("<s>", "")
         outputs.append(output)
 
+    data["augmented_text"] = outputs
+    data.to_csv(os.path.join(DATA_DIR, "train_augmented.csv"), index=False)
+
 
 if __name__ == "__main__":
     args = argparse.ArgumentParser()
