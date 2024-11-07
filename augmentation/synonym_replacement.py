@@ -11,6 +11,15 @@ from utils.util import set_seed
 
 
 def main(arg):
+    """
+    Synomym replacement for augmentation using masked LM
+
+    Args:
+        SEED (int): random seed number (default: 456)
+        MODEL_ID (str): huggingface model id (default: FacebookAI/xlm-roberta-large)
+        NUM_LABELS (int): the number of labels to predict (default: 7)
+        TOP_K (int): the number of candidates for synonym replacements (default: 3)
+    """
     # paramterts
     SEED = arg.seed
     MODEL_ID = arg.model_id
