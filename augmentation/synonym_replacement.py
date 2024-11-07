@@ -3,6 +3,7 @@ import os
 import random
 
 import pandas as pd
+import torch
 from tqdm import tqdm
 from transformers import AutoModelForMaskedLM, AutoTokenizer, pipeline
 
@@ -32,7 +33,7 @@ def main(arg):
         "fill-mask",
         model=model,
         tokenizer=tokenizer,
-        device="cuda",
+        device="cuda" if torch.cuda.is_available() else "cpu",
         top_k=TOP_K,
     )
 
