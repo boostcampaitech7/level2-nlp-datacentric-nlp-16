@@ -1,6 +1,5 @@
 import re
 
-import transformers
 from langchain.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
@@ -10,6 +9,15 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 
 
 def calculate_ratio(text):
+    """
+    Calculate korean character ratio in text to find the noisy text
+
+    Args:
+        text (str): input text
+
+    Returns:
+        float: korean character ratio
+    """
     total_chars = len(text)
     if total_chars == 0:
         return (0, 0)
@@ -21,6 +29,17 @@ def calculate_ratio(text):
 
 
 def denoise_text(texts, model_id, template):
+    """
+    Denoise noisy text using LM with prompt engineering
+
+    Args:
+        texts (List[str]): input texts
+        model_id (str): huggingface model id
+        template (str): prompt template
+
+    Returns:
+        List[str]: denoised texts
+    """
     tokenizer = AutoTokenizer.from_pretrained(model_id)
     model = AutoModelForCausalLM.from_pretrained(model_id)
 
