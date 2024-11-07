@@ -1,4 +1,5 @@
 import argparse
+import os
 
 import pandas as pd
 import torch
@@ -19,7 +20,9 @@ def main(arg):
     set_seed(SEED)
 
     ## data loading
-    data = pd.read_csv("./data/add_B.T_train_kang.csv")
+    BASE_DIR = os.getcwd()
+    DATA_DIR = os.path.join(BASE_DIR, "data")
+    data = pd.read_csv(os.path.join(DATA_DIR, "train.csv"))
 
     ## model loading
     tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
@@ -52,7 +55,7 @@ def main(arg):
     idx = label_issues["is_label_issue"] == True
     data.loc[idx, "target"] = label_issues.loc[idx, "predicted_label"]
 
-    data.to_csv("./data/train_corrected.csv")
+    data.to_csv(os.path.join(DATA_DIR, "train_corrected.csv"), index=False)
 
 
 if __name__ == "__main__":
