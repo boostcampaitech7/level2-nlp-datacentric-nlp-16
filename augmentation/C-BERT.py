@@ -25,7 +25,14 @@ def main(arg):
     for label-robust augmentation
 
     Args:
-        arg (_type_): _description_
+        SEED (int): random seed number (default: 456)
+        MODEL_ID (str): huggingface model id (default: FacebookAI/xlm-roberta-large)
+        NUM_LABELS (int): the number of labels to predict (default: 7)
+        TOP_K (int): the number of candidates for synonym replacements (default: 3)
+        EOPCHS (int): epoch size (default: 10)
+        BATCH_SIZE (int): batch size (default: 16)
+        LEARNING_RATE (float): learning rate for training C-BERT (default: 0.001)
+        WEIGHT_DECAY (float): weight decay for learning rate scheduler (default: 0.0001)
     """
     ## paramterts
     SEED = arg.seed
