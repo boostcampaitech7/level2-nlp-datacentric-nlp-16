@@ -11,6 +11,15 @@ from utils.util import set_seed
 
 
 def main(arg):
+    """
+    Clean label nosie using cleanlab
+
+    Args:
+        SEED (int): random seed number (default: 456)
+        MODEL_ID (str): huggingface model id (default: klue/roberta-base)
+        MAX_ITER (int): max iteration for logistic regression (default: 400)
+        K (int): number of folds for cross validation (default: 5)
+    """
     SEED = arg.seed
     MODEL_ID = arg.model_id
     MAX_ITER = arg.max_iter
@@ -33,7 +42,7 @@ def main(arg):
 
     ## embedding
     tokenized = tokenizer(
-        data["B.T_text"].tolist(),
+        data["text"].tolist(),
         padding=True,
         truncation=True,
         max_length=128,
