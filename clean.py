@@ -46,14 +46,15 @@ def main(arg):
     cleanable_data = data[idx]
 
     ## denoise
-    with open(os.path.join(BASE_DIR, "prompt.txt"), "r") as f:
+    PROMPT_DIR = os.path.join(BASE_DIR, "prompts")
+    with open(os.path.join(PROMPT_DIR, "prompt_llama.txt"), "r") as f:
         template = f.read()
+    
     output_txts = denoise_text(
         texts=cleanable_data["text"].tolist(),
         model_id=MODEL_ID,
         template=template,
     )
-
     data.loc[idx, "text"] = output_txts
 
     ## remove not-cleanable text
