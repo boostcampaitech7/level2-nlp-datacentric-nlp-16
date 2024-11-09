@@ -48,27 +48,21 @@ def denoise_text(texts, model_id, template):
     llm = ChatHuggingFace(llm=llm)
 
     prompt = PromptTemplate.from_template(template)
-    chain = {"title": RunnablePassthrough()} | prompt | llm.bind(stop=[r"\n"]) | StrOutputParser()
+    chain = {"text": RunnablePassthrough()} | prompt | llm.bind(stop=[r"\n"]) | StrOutputParser()
 
     output_txts = []
     removed = 0
     for text in tqdm(texts):
         answer = chain.invoke(text)
 
-        ## answer line extraction in prompt
+        ## answer extraction in prompt
         answer = answer.split("\n").pop()
-        ## answer phrase extraction in answer line
-        ### for case that the answer is empty
-        try:
-            answer = answer.split('"')[1::2].pop()
-        except:
-            removed += 1
-            answer = text
+
         ### for case that the answer is less than or equal to 5 in length
         if len(answer) <= 5:
             removed += 1
             answer = text
 
         output_txts.append(answer)
-    print(f"{removed}-rows returned less than or equal to 5 in length, so they remain unchanged")
+    print(f"{removed}-rows with lengths less than or equal to 5 are returned, and they remain unchanged")
     return output_txts
