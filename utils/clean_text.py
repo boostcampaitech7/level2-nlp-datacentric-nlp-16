@@ -48,7 +48,7 @@ def denoise_text(texts, model_id, template):
     llm = ChatHuggingFace(llm=llm)
 
     prompt = PromptTemplate.from_template(template)
-    chain = {"title": RunnablePassthrough()} | prompt | llm.bind(stop=[r"\n"]) | StrOutputParser()
+    chain = {"text": RunnablePassthrough()} | prompt | llm.bind(stop=[r"\n"]) | StrOutputParser()
 
     output_txts = []
     removed = 0
