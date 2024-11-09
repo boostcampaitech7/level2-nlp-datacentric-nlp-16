@@ -22,7 +22,7 @@ def calculate_ratio(text):
     if total_chars == 0:
         return (0, 0)
 
-    korean_chars = len(re.findall(r"[가-힣]", text))
+    korean_chars = len(re.findall(r"[가-힣\s]", text))
     korean_ratio = korean_chars / total_chars
 
     return korean_ratio
