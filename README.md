@@ -1,7 +1,11 @@
-# :rocket: Open Domain Question Answering (ODQA)
+# :rocket: Data-Centric Topic Classification
 
 ## :closed_book: 프로젝트 개요
-본 프로젝트는 Retrieval을 기반으로한 Question Answering(QA)를 주제로 하고 있습니다. 질문-문맥-정답 쌍으로 구성된 데이터를 활용해서 특정 질문에 대한 정답을 반환하는 모델을 개발하는 것이 목적입니다. 이러한 모델은 방대한 지식에 접근할 수 있는 효율적인 방안을 제시할 수 있습니다. 다양한 표현에 대한 retrieval 성능 개선, reader를 통한 유연한 답변 생성 등 모델 고도화를 통해 기존의 검색 엔진에서 더욱 발전된 검색 기술을 구현할 수 있을 것입니다.
+본 프로젝트는 Topic Classification 문제를 Data-Centric한 접근을 통해 해결하는 것을 주제로 하고 있습니다.
+
+현업에서 데이터의 중요도는 매우 높습니다. 하지만, ML/DL 모델에 비해 데이터에 관한 연구는 활발히 이루어지지 않고 있습니다. 본 프로젝트는 이러한 흐름에서 벗어나 모델에 대한 수정 없이 Data-Centric한 접근 만으로 모델의 성능을 극대화시키고, 해당 과정에서 데이터의 품질을 개선할 수 있는 다양한 방안에 대해 탐구하는 것을 목표로 하고 있습니다.
+
+이러한 접근 방식은 현업에서의 복잡하고 잘 정제되지 않은 데이터들을 적절히 처리하는 일에 솔루션을 제공할 수 있습니다.
 
 ## :family_man_man_boy_boy: 멤버 소개
 |강경준|김재겸|원호영|유선우|
@@ -11,10 +15,10 @@
 ## :balance_scale: 역할 분담
 |팀원| 역할 |
 |:---:| --- |
-| 강경준 | EDA, 모델링, 모델 실험 코드 관리, 모델 성능 개선 실험 |
-| 김재겸 | EDA 및 데이터 검수, 데이터 전처리 및 증강 실험, 모델 서치 및 파라미터 튜닝 등 모델 성능 개발, 앙상블 |
-| 원호영 | EDA 및 데이터 검수, 데이터 증강 조사⋅실험 및 관련 코드관리, 모델 서치 및 실험 |
-| 유선우 | EDA 및 데이터 검수, 텍스트 정제, 프로젝트 구조 관리, 모델 실험 및 파라미터 튜닝 |
+| 강경준 | noisy text detection, text denoising, c-bert, code 관리 |
+| 김재겸 | text denoising, noisy text detection, data relabeling, mix-up |
+| 원호영 | augmentation, text denoising, back translation, word random shuffle |
+| 유선우 | 프롬프트용 예시 데이터 조사, text denoising, prompt engineering |
 
 ## :computer: 개발/협업 환경
 - 컴퓨팅 환경
@@ -25,270 +29,238 @@
   	- ![zoom](https://img.shields.io/badge/Zoom-0B5CFF?style=flat-square&logo=Zoom&logoColor=white)
 
 ## :bookmark_tabs: 데이터 설명
-- 데이터 구성
-  - train_dataset / test_dataset
-	  - question: 질문 text
-    - context: 질문에 대한 답이 포함된 passage
-    - answer (train_dataset only)
-      - answer index: context 내에서 정답이 시작되는 index
-      - answer text: text형태로 제시된 context 내의 정답
-    - wikipedia_documents
-      - 위키피디아 문서 집합
+- 데이터 설명
+  - Train / Test (2,800 / 30,000)
+  - 구성
+	  - ID : 각 데이터 샘플 ID
+    - text : 기사 제목
+    - target : 기사 분류 / 정수형 인코딩
+      - 생활문화, 스포츠, 세계, 정치, 경제, IT과학, 사회의 7가지 주제 중 하나
+  - 특징
+    - text, target에 noise 포함
+    - text 중 일부를 다른 ascii 코드로 변경
+    - target 중 일부 임의로 변경
 
 ## :card_index_dividers: 프로젝트 구조
 ```
-. level2-mrc-nlp-16
-├─ .gitihub
+. level2-datacentric-nlp-16
+├─ .github
 ├─ data
-│  ├─ embedding
-│  │  ├─ context_sparse_embedding.bin
-│  │  └─ context_dense_embedding.bin
-│  ├─ test_dataset
-│  └─ train_dataset
-├─ data_modules
-│  ├─ data_sets.py
-│  └─data_loaders.py
-├─ model
-│  ├─ loss.py
-│  ├─ metric.py
-│  └─ model.py
+│  ├─ train.csv
+│  └─ test.csv
+├─ dataloader
+│  └─ datasets.py
+├─ augmentation
+│  ├─ C-BERT.py
+│  ├─ back_translation.py
+│  ├─ shuffle.py
+│  └─ synonym_replacement.py
+├─ prompts
+│  ├─ prompt_gemma.py
+│  └─ prompt_llama.py
 ├─ utils
-│  ├─ __init__.py
-│  ├─ add_data.py
-│  ├─ embedding.py
-│  ├─ augmentation.py
-│  ├─ augmentation_requirements.py
+│  ├─ clean_text.py
 │  └─ util.py
 ├─ .flake8
 ├─ .gitignore
 ├─ .gitmessage.txt
 ├─ .pre-commit-config.yaml
 ├─ README.md
-├─ config_reader.yaml
-├─ config_retrieval.yaml
-├─ context_dense_embedding.yaml
-├─ context_sparse_embedding.yaml
-├─ inference.py
 ├─ requirements.txt
-├─ train_reader.py
-├─ train_retrieval.py
-└─ test.py
+├─ baseline_code.ipynb
+├─ clean.py
+└─ label_corrector.py
 ```
-
-## :book: 프로젝트 수행 결과
-- EDA
-	- Unknown token 분석
-		- 정상적인 단어임에도, 인식되지 않는 경우
-      - 예시
-        - 없앴다는
-        - 보살핌으로
-        - 꾸밈이
-        - 옻칠, 옻나무
-        - 쨍그렁거릴
-        - 슬펐다
-      - 예상 처리 방안
-        - 인식되지 않는 글자 분석 후 추가
-        - 적절한 의미 단위를 토큰으로 추가
-      - 예상 효과
-        - 더욱 다양한 단어에 대한 인식 가능
-        - 의미 단위를 토큰으로 추가하는 경우, 같은 의미를 갖는 단어의 활용형에 대해 다른 방식으로 토큰화가 되는 경우가 생길 수 있을 것으로 예상
-    - 외국인 이름을 한글로 표기시, 한글에서 잘 사용되지 않는 글자가 포함되는 경우
-      - 예시
-        - 벵골
-        - 먀스코프스키
-        - 듄
-        - 베이욘
-      - 예상 처리 방안
-        - 인식되지 않는 글자 분석 후 추가
-      - 예상 효과
-        - 질문에 특정 인물의 이름이 직접적으로 들어가는 경우도 많기 때문에, 성능 개발에 도움이 될 것으로 예상
-  - Annotation Bias
-    - 토큰화된 텍스트를 기준으로 question의 토큰이 context에 포함되는 비율을 통해 annotation bias 측정
-    - Summary for covering ratio
-      | Statistic | Value |
-      |-----------|-------|
-      | Mean | 0.70 |
-      | Standard deviation | 0.11 |
-      | Minimum  | 0.10 |
-      | Maximum  | 1.00 |
-      - 꽤 높은 covering ratio를 보여줌
-      - sparse embedding이 좋은 성능을 보일 것으로 생각됨
-    - 예상 처리 방안
-      - 유사어 대체 등의 augmentation을 통한 언어 표현의 다양성 확보
-
-- Augmentation
-  - 어순 변경(EDA)
-    - 설명
-      - 임의로 문장의 단어 순서를 변경하여 데이터의 다양성 확보
-    - 적용 예시
-	    - 대통령을 포함한 미국의 행정부 견제권을 갖는 국가 기관은? → 대통령을 포함한 미국의 행정부 견제권을 갖는 기관은? 국가
-  	  - 현대적 인사조직관리의 시발점이 된 책은? → 현대적 인사조직관리의 시발점이 책은? 된
-   	  - 강희제가 1717년에 쓴 글은 누구를 위해 쓰여졌는가? → 강희제가 글은 쓴 1717년에 누구를 위해 쓰여졌는가?
-    - 결과
-	    - 증강된 문장과 원래 문장간의 의미 차이는 크지 않음
-  	  - 해당 데이터 적용시 성능 저하 발생
-   	  - 언어 표현의 다양성 확보 차원에서도 의미 없음
-      - | Method | EM | F1 |
-        |--------|----|----|
-        | Base | 0.5708 | 0.6629 |
-        | Augmented | 0.5541 | 0.6385 |
-  - 특수 기호 추가(AEDA)
-    - 설명
-      - text에 임의로 구두점('.', ',', '!', '?', ';')을 추가 하여 데이터의 다양성을 확보
-    - 적용 예시
-	    - 대통령을 포함한 미국의 행정부 견제권을 갖는 국가 기관은? → 대통령을 포함한 미국의 행정부 견제권을 . 갖는 국가 기관은? ;
-  	  - 현대적 인사조직관리의 시발점이 된 책은? → "현대적 인사조직관리의 시발점이 된 , 책은? ;
-   	  - 강희제가 1717년에 쓴 글은 누구를 위해 쓰여졌는가? → "강희제가 , 1717년에 쓴 글은 , 누구를 위해 쓰여졌는가? ?
-    - 결과
-	    - EM은 소폭 증가했으나, F1은 소폭 감소
-  	  - 유의미한 차이를 발견할 수 없음
-      - | Method | EM | F1 |
-        |--------|----|----|
-        | Base | 0.5708 | 0.6629 |
-        | Augmented | 0.5875 | 0.6599 |
-  - 질문 생성
-    - 설명
-      - 주어진 데이터 상의 질문에 이어지는 내용을 생성하여 증강
-      - 언어 모델 (skt/kogpt2-base-v2) 기반으로 생성
-    - 적용 예시
-	    - 대통령을 포함한 미국의 행정부 견제권을 갖는 국가 기관은? → 대통령을 포함한 미국의 행정부 견제권을 갖는 국가 기관은?? 이런 문제를 해결해달라는 게 아니라 미국의 경제력을 어떻게 키워야 할 것인가? 이런 문제의
-  	  - 현대적 인사조직관리의 시발점이 된 책은? → 현대적 인사조직관리의 시발점이 된 책은?이다. 이런 책은 '외부에 의한 조직관리가 아니라 내부의 자발적 조직관리가 이루어져야 한다'는 것을
-   	  - 강희제가 1717년에 쓴 글은 누구를 위해 쓰여졌는가? → 강희제가 1717년에 쓴 글은 누구를 위해 쓰여졌는가?라는 질문으로 시작되었다. 아니면 누구를 위해 쓰여졌는가? 누가 누구에게
-    - 결과
-	    - 생성된 문장의 질이 안 좋음
-      - | Method | EM | F1 |
-        |--------|----|----|
-        | Base | 0.5708 | 0.6629 |
-        | Augmented | 0.5875 | 0.6772 |
-  - 역번역
-    - 설명
-      - 한국어를 영어로 번역한 뒤 다시 한국어로 번역하는 과정을 통해 text의 다양성 확보
-    - 적용 예시
-	    - 대통령을 포함한 미국의 행정부 견제권을 갖는 국가 기관은? → 어떤 국가기관이 대통령을 포함한 미국 행정부를 견제할 권리가 있는가?
-  	  - 현대적 인사조직관리의 시발점이 된 책은? → 현대 인사 운영의 출발점이 어떤 책이 됐을까?
-   	  - 강희제가 1717년에 쓴 글은 누구를 위해 쓰여졌는가? → 강희제가 누구를 위해 1717년에 썼나요?
-    - 결과
-	    - 생성된 문장의 질이 좋음
-  	  - 언어 표현의 다양성을 확보하는 데 도움이 됨
-      - | Method | EM | F1 |
-        |--------|----|----|
-        | Base | 0.5708 | 0.6629 |
-        | Augmented | 0.5678 | 0.6682 |
-	
-- Modeling
-  - chunking
-    - task 설명
-      - context가 너무 길어서, 모델의 input size 제한을 넘는 경우 발생
-      - 긴 text를 chunk별로 나누어 결과 도출
-    - chunking 적용 방안
-      - fixed length
-        - 일정 길이 단위로 chunking
-        - stride를 설정하여 전 후의 chunk가 일정 길이의 공통된 부분 보유
-      - truncation
-        - 일정 길이로 절단하여 retrieval 진행 (첫 번째 chunk만 활용)
-        - 좋은 성능 보임
-        - 많은 문서들이 두괄식으로 작성돼 있어서 성능이 괜찮을 수 있다는 의견
-      - summary
-        - 두괄식 문서를 기대하는 것 보다, summary를 직접 생성 후 활용하는 방안 가능
-        - summary를 시도했으나, 즉각적인 성능 향상이 나타나지는 않음
-        - 문제 해결을 위한 분석 필요 했지만, 전체 context dataset에 대한 summary 생성에 지나치게 많은 시간 소비되므로 방법론 적용이 어려움
-      - chunk별 결과 합산 방안
-        - mean
-          - 각 text에 대한 chunk 별 embedding vector의 평균을 구하는 방식
-        - max
-          - 각 chunk별 embedding과 question embedding에 대한  similarity의 최대값 활용
-          - 이러한 방식은 search를 위해서 chunk별 embedding을 모두 저장해야 함 → 메모리 문제 발생
-      - 문제점
-        - chunk 길이가 매우 큰 경우
-          - 문제 상황
-            - token length 512 기준으로 최대 80개 가량의 chunk가 생성되는 경우까지 존재 → OOM 발생
-            - chunk를 나누고 batch size를 1로 만들어도 OOM이 발생
-            - reader model에서는 모든 context를 활용해서 답을 찾아야 하기 때문에, 문서를 일정 길이에서 절단 불가
-          - 해결 방안
-            - 이러한 문제를 해결하기 위해, batch size를 1로 고정하고 각 청크를 개별적으로 모델에 입력하는 방식을 통해, OOM 문제를 피함
-            - OOM을 피하기 위해 train data를 한 번에 전부 계산하지 않고, mini-batch를 활용하는 것과 같은 원리
-  - hybrid retrieval
-    - task 설명
-      - question과 context 사이의 단어 표현에 대한 높은 covering ratio 기반으로 sparse embedding의 높은 성능 예상
-      - 적절한 augmentation과 추가 데이터 활용이 가능하다면, dense embedding을 활용하여 일반화 성능 향상 가능
-    - sparse embedding 적용
-      - context별로 길이의 차이가 크기 때문에 이러한 점을 반영하기 위해 bm25 활용
-      - parameter test
-        | K1 | top-k match ratio |
-        |----|-------------------|
-        | 0.5 | 0.8833 |
-        | 0.8 | 0.9 |
-        | 1 | 0.8958 |
-        | 2 | 0.8833 |
-        | 3 | 0.8708 |
-        - K1 : bm25 parameter
-        - top-k match ratio : 선택한 k개의 context 중 real context가 포함되는 비율
-  - concat retrieval
-    - task 설명
-      - 두 텍스트를 concat하여 모델 output으로 유사도를 반환하는 방식 적용
-      - question과 context간의 attention 활용이 가능하기 때문에, 더 좋은 성능을 보일 것으로 예상
-    - 문제점
-      - 각각 embedding하는 경우는 search할 때 미리 context에 대한 embedding을 계산한 뒤에, search를 진행하는 것이 가능
-      - 하지만, concat method는 새로운 질문이 나올 때 마다 모든 context와 concat을 통한 계산 필요 → 메모리 및 계산 시간 문제
-    - 활용 방안
-      - Reranking을 활용하여 sparse embedding을 통해 k1개의 문서를 선택한 뒤, 해당 문서에 대해서만 concat retrieval 적용을 통해 계산량 최소화
-    - 결과
-      | Method | top-k match ratio |
-      |--------|-------------------|
-      | Not Concat | 0.7625 |
-      | Concat | 0.8875 |
-      - top-k match ratio : 선택한 k개의 context 중 real context가 포함되는 비율
-      - not concat은 기존에 활용하던 sparse embedding과의 weighted mean 방식을 활용하여, 최종 선택까지 sparse embedding의 영향을 받아 더욱 높은 점수가 나오는 것으로 예상
-- 모델서치
-  - 고려 사항
-    - retrieval의 경우 embedding을 생성하는 문제이기 때문에, encoder model 위주로 search
-    - reader의 경우 extraction based MRC를 진행할 것이기 때문에 reader model 또한 encoder model 위주로 search
-    - 긴 text 처리해야 하는 상황을 고려하여 RoBERTa 계열 모델 위주로 활용
-      - BERT는 아무 두 문장을 붙여서 학습하기 때문에, 아주 짧은 케이스도 존재
-      - RoBERTa는 토큰화된 문장 길이가 512가 넘지 않는 선에서 최대한 문장을 이어 붙여서 학습
-      - 따라서, 여러 문장으로 이루어진 긴 context를 처리하는 task에서 더 좋은 성능 예상
 
 ## 실행 코드
 
-### train_retrieval.py / train_reader.py
+### clean.py
 
 ```bash
-wandb sweep config_retrieval.yaml  ## retrieval 학습
-wandb sweep config_reader.yaml  ## reader 학습
-wandb agent SWEEP_ID --count 5 ## SWEEP_ID에 위에서 반환된 sweep id   ## --count 뒤에는 반복 실험 진행할 횟수
+# text denoising
+## -s : seed number setting
+## -m : huggingface model id
+## -ku : korean ratio upper bound
+## -kl : korean ratio lower bound
+python3 clean.py -s 456 -m aifeifei798/Meta-Llama-3.1-8B-Instruct -ku 0.75 -kl 0.5
 ```
 
-### context_sparse_embedding.py
+### label_corrector.py
 
 ```bash
-# -m : model name (AutoModel.frompretrained()에 넣는 model name)
-# -k, -b, -e : bm25 parameter (optional, float)
-python context_sparse_embedding.py -m jhgan/ko-sroberta-multitask
+# label denoising
+## -s : seed number setting
+## -m : huggingface model id
+## -mi : max iteration for logistic regression
+## -k : number of folds for cross validataion
+python3 label_corrector.py -s 456 -m klue/roberta-base -mi 400 -k 5
 ```
 
-### context_dense_embedding.py
+### C-BERT.py
 
 ```bash
-# -mp : model path (artifact 상의 model path, 하단 첫 번째 이미지 빨간 밑줄)
-# -mn : model name (artifact 상의 model name, 하단 두 번째 이미지 빨간 밑줄)
-# -b : batch size (optional, int)
-python3 context_dense_embedding.py -mp [model path] -mn [model name]
+# C-BERT augmentation
+## -s : random seed number
+## -m : huggingface model id
+## -n : the number of labels to predict
+## -k : the number of candidates for synonym replacements
+## -e : epoch size
+## -b : batch size
+## -lr : learning rate for training C-BERT
+## -w : weight decay for learning rate scheduler
+python3 C-BERT.py -s 456 -m FacebookAI/xlm-roberta-large -n 7 -k 3 -e 10 -b 16 -lr 0.001 -w 0.0001
 ```
 
-### test.py
+### synonym_replacement.py
 
 ```bash
-# -rtmp : retrieval model path (artifact 상의 model path)
-# -rtmn : retrieval model name (artifact 상의 model name)
-# -rdmp : reader model path (artifact 상의 model path)
-# -rdmn : reader model name (artifact 상의 model name)
-# -k : number of selected contexts (optional, int)
-# -w : weight for dense embedding in hybrid model (optional, float, 0~1)
-python3 test.py -rtmp [retrieval model path] -rtmn [retrieval model name] -rdmp [reader model path] -rdmn [reader model name]
+# synonym replacement augmentation
+## -s : random seed number
+## -m : huggingface model id
+## -n : the number of labels to predict
+## -k : the number of candidates for synonym replacements
+python3 synonym_replacement.py -s 456 -m FacebookAI/xlm-roberta-large -n 7 -k 3
 ```
 
-### inference.py
+## :book: 프로젝트 수행 결과
+- Text Noise Detection
+	- 목적
+		- data 상에는 수정하지 않아도 될 만큼 깔끔한 text와 어느 정도 수정이 가능한 text, 수정할 수 없는 정도로 손상된 text 등 여러 유형의 text가 존재
+    - text에 대한 손상 정도를 정의하여, 수정할 text를 선별하는 과정 필요
+  - 한국어 비율
+    - 한글 문자가  영어, 특수 문자, 공백 및 숫자 등으로 대체되는 방식의 noise
+    - 손상이 큰 text는 text내 한글 비율이 낮을 것으로 예상됨
+    - 따라서, 한글 비율을 기준으로  구간을 나누어 normal data, cleanable data, not-cleanable data 분류
+    - normal data
+      - 전혀 손상되지 않았거나, 수정하지 않아도 괜찮은 수준
+      - 예시 (한글 및 공백 비율 0.8 이상 기준)
+        - 페이스북 인터넷 드론 아퀼라 실물 첫 시험비행 성공
+        - 해외로밍 m금폭탄 n동차단 더 빨$진다
+        - 땅 파= 코l나 격리시설 탈출한 외국인 청_서 VS
+    - cleanable data
+      - 약간 손상됐지만, 원형을 어느정도 추정 가능한 수준
+      - 예시 (한글 및 공백 비율 0.8 미만 0.6 이상 기준)
+        - m 김정) 자주통일 새,?r열1나가야1보
+        - 코로나 r대^등교)모습
+        - 문대통령 김정*m트/프7 YTD 조속히H끝내고 A다고!,p2합
+    - not-cleanable data
+      - 손상이 너무 커, 원형을 추정할 수 없는 수준
+      - 예시 (한글 및 공백 비율 0.6 미만 기준)
+        - E달A](j상ZwQ선 일*77아-는데… nfD편
+        - .달 CES %굴#N바@은^새a|더o폰I중저o폰O rb
+        - 여행^식e한$8수&mT30,_Y기! 사진# 이마진 프<스
 
-```bash
-python3 inference.py -rtmp [retrieval model path] -rtmn [retrieval model name] -rdmp [reader model path] -rdmn [reader model name]
-```
+- Text Denoising
+  - 목적
+    - text에 적용된 noise 규칙을 분석하고, 이를 기반으로 원형을 복구하는 것을 목적으로 함
+    - text의 원형에 대한 데이터를 활용한 학습을 진행할 수 없으므로, LLM에 prompt engineering을 적용하는 방안 활용
+  - 모델 선정
+    - 선정 기준
+      - noise가 섞인 문장을 복원하는 작업에는 높은 수준의 추론 능력 요구됨
+      - 하지만, 제한된 컴퓨팅 리소스 내에서 기대할 수 있는 모델의 추론 능력에는 한계가 있음
+      - 따라서, 작은 크기로 최대한의 효용을 낼 수 있는 모델을 기준으로 선정
+    - Llama
+      - scaling law 기반으로 model size에 적합한 dataset size를 통해, 제한된 모델 크기 내에서 최고의 효율성 달성
+      - Llama - 8B 모델 활용
+    - Gemma
+      - scaling law 기반의 적절한 dataset size에 더불어, 작은 모델에 큰 모델의 지식을 전달하는 지식 증류 학습 기술을 통해 작은 크기의 모델에서도 좋은 성능을 달성
+      - Gemma - 9B 모델 활용
+  - Prompt Engineering
+    - Few shot
+      - Llama - 8B 모델 활용
+      - 문장 복원에 대한 예시 기반의 질문과 답변 쌍으로만 prompt를 구성
+      - 결과
+        - Llama model 활용
+        - Accuracy : 0.7205 / F1-score : 0.7041
+        - CoT 기반의 prompt에 비해 부족한 성능
+        - 자의적으로 수정하는 경우 대부분
+        - 손상이 덜한 텍스트에 오히려 손상을 주는 경우도 발생
+    - Chain of Thoughts
+      - 문장의 복원 단계 및 규칙을 세부적으로 나누어 지시
+      - Llama model base
+        - Llama - 8B 모델 활용
+        - 노이즈 패턴 설명⋅복원 규칙 제시⋅예시⋅복원 요청문의 4단계로 구성
+        - 결과
+          - 아이`XSI수리0* b대`…맥3 디dF레< 41/' => 아이폰XS 수리비도 '역대급'…맥스 디스플레이 41만원
+          - STJ레콤 J분기 영D익t4천105t…2>1％ 증가=>STL레콤, 1분기 영업이익 1천105억원…전년比 2% 증가
+          - 정i :파1 미사z KT( 이용기간 2e 단] Q분종U2보 => 1월 2일부터 3개월 동안 KT 인터넷을 이용할 수 있습니다.
+          - 문장의 완결성 높음
+          - 다소 자의적인 수정을 하는 경우 여전히 존재
+          - Accuracy : 0.7211 / F1-score : 0.7113
+      - Gemma model base
+        - Gemma - 9B 모델 활용
+        - 복원 조건⋅복원 단계⋅복원 예시⋅복원 요청문의 4단계로 구성
+        - 결과
+          - 인간이 데이터를 복원할 때 어떤 순서로 진행할지를 고민하여 프롬프트를 조건, 단계, 예시로 나누어 지정
+          - 조건, 예시, 요청의 3단계 구성 보다, 복원 단계를 추가하였을 때 더 좋은 품질의 결과물을 생성
+          - 하나의 예시만 주었을 때 보다 여러 개의 예시를 주었을 때 더 좋은 결과물을 생성
+          - score
+    - 결론
+      - 단순히 예시를 연속적으로 제시하는 것 보다, 세부적으로 과정을 설명하는 것이 모델에게도 도움이 됨
+      - 다만, 규칙을 설정해도 규칙이 완벽하게 지켜지지는 않으므로, 규칙에 대한 적절한 예시도 함께 제시하는 게 좋음
+	
+- Label Denoising
+  - Denoising Tool
+    - CleanLab
+      - DL기반의 text embedding 모델에 linear layer를 추가하고 해당 layer에 대한 학습을 통해, classification task 수행
+        - 학습 코드의 용이함과 CleanLab과의 호환성을 고려하여, logistic regression을 적용하는 방식으로 linear layer 대체
+        - logistic regression에서 더욱 확장하여, SVM⋅Random Forest 등 다양한 ML 모델 적용 및 앙상블
+      - 각 label 별 predicted probability에 대해 threshold를 설정하고, 해당 threshold 이하일 경우 labeling error로 판단
+        - 일반적으로 threshold는 각 label로 예측된 데이터에 대해 predicted probability의 평균값 활용
+        - Over-correcting을 방지하기 위하여, Mis-labeling data의 개수에 맞춰 threshold 조정 시도
+    - 결과
+      - logistic regression
+        - Accuracy : 0.8237 / F1-score : 0.8218
+      - ensemble
+        - 모델 구성 : logistic regression, randomforestclassifier, SVM
+        - Accuracy : 0.8266 / F1-score : 0.8241
+	
+- Augmentation
+  - C-BERT
+    - BERT 기반의 Masked LM을 활용한 유사어 대체 증강 기법
+    - BERT 모델의 input에 label embedding을 추가하여, label 정보를 반영한 증강 구현
+    - 결과
+      - train data 상의 noise로 인해, label embedding에 대한 적절한 학습이 어려움
+      - <MASK> 토큰을 각종 특수문자로 예측하는 경우 발생
+  - 유의어 대체
+    - Masked LM을 활용한 유사어 대체 증강 기법
+    - 결과
+      |  | Accuracy | F1-Score |
+      |--|----------|----------|
+      | 증강 전 | 0.8275 | 0.8246 |
+      | 증강 후 | 0.8297 | 0.8269 |
+  - Back Translation
+    - 한국어를 영어로 번역한 뒤 다시 한국어로 번역하여, 번역 과정에서 발생하는 언어 표현의 다양성 활용
+    - 번역 모델의 활용에 있어서 번역 자체의 품질은 매우 중요
+    - 한국어 자연어 처리에 특화되어, 한국어 번역 관련해서도 좋은 성능을 보여주는 Kakao brain/Pororo 자연어 처리 프레임워크의 번역 모델 활용
+    - 결과
+      |  | Accuracy | F1-Score |
+      |--|----------|----------|
+      | 증강 전 | 0.7584 | 0.7546 |
+      | 증강 후 | 0.7917 | 0.7836 |
+      - 번역 과정에서, 기사 제목에서 주로 사용하는 문체 탈피
+  - Random word Shuffle
+    - Text에 대해 조사를 제외한 단어 순서 임의로 변경하여 데이터 증강
+    - 결과
+      |  | Accuracy | F1-Score |
+      |--|----------|----------|
+      | 증강 전 | 0.8110 | 0.8050 |
+      | 증강 후 | 0.8084 | 0.8021 |
+      - 임의 변경으로 인해, 문장의 완결성 보존에 한계
+      - 기존 표현과 비교해, 다양성 확보에 크게 도움이 되지는 않음
+  - Mix-Up
+    - Text embedding 기준으로 선형 보간 데이터 생성을 통해 증강
+    - 여러 label에 대한 데이터를 교차로 mix할 경우 label 배정에 문제가 있으므로, 각 label 별로 적용
+    - 결과
+      |  | Accuracy | F1-Score |
+      |--|----------|----------|
+      | 증강 전 | 0.8266 | 0.8241 |
+      | 증강 후 | 0.8185 | 0.8173 |
+
+- 최종 제출 모델
+  - Text denoising 과정에서 발생할 수 있는 원본 훼손에 대비하여, denoising 후 원본 텍스트에 증강하는 방식 활용
+  - Llama, Gemma model 각각 denoising 결과에 차이가 있으므로, 각각의 결과를 모두 활용
+  - 기타 성능 향상을 확인할 수 있었던, back translation, 유의어 대체 활용
+  - validation의 의미가 크지 않다고 생각하여, 최종 제출시에는 testsize를 0.01로 설정하여 최대한 많은 양의 데이터를 학습하도록 함
+  - 결과
+    - Accuracy : 0.8401 / F1-score : 0.8365
