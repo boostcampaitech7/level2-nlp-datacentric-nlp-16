@@ -23,7 +23,7 @@
 | 강경준 | noisy text detection, text denoising, c-bert, code 관리 |
 | 김재겸 | text denoising, noisy text detection, data relabeling, mix-up |
 | 원호영 | augmentation, text denoising, back translation, word random shuffle |
-| 유선우 | 프롬프트용 예시 데이터 조사, text denoising, prompt engineering |
+| 유선우 | EDA, analysis for noise pattern, text denoising |
 
 ## :computer: 개발/협업 환경
 - **컴퓨팅 환경**
