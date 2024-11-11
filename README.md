@@ -127,6 +127,24 @@ python3 C-BERT.py -s 456 -m FacebookAI/xlm-roberta-large -n 7 -k 3 -e 10 -b 16 -
 python3 synonym_replacement.py -s 456 -m FacebookAI/xlm-roberta-large -n 7 -k 3
 ```
 
+### PororoBT.py
+
+```bash
+# back translation augmentation
+## -i : "input.csv" name 
+## -o : "output.csv" name
+python3 PororoBT.py -i train.csv -o ouput.csv
+```
+
+### Shuffle.py
+
+```bash
+# Random word shuffle augmentation
+## -i : "input.csv" name 
+## -o : "output.csv" name
+python3 Shuffle.py -i train.csv -o ouput.csv
+```
+
 ## :book: 프로젝트 수행 결과
 - **Text Noise Detection**
 	- **목적**
