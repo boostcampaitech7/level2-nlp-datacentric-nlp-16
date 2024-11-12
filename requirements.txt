@@ -1,0 +1,14 @@
+transformers
+sentencepiece
+numpy
+pandas
+torch
+evaluate
+accelerate
+scikit-learn
+ipywidgets
+wandb
+langchain
+langchain_core
+langchain_huggingface
+cleanlab
